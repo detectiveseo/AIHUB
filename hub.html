@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Universe-Hub</title>
+  <!-- bootstrap link -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+
+<body class="container">
+
+  <header>
+    <h2 class="text-center mt-3">AI Universe Hub</h2>
+    <div class="d-flex justify-content-center mt-3 mb-5">
+      <button class="rounded px-3 py-2 border-0 bg-danger bg-gradient fw-semibold text-white">Sort By Date</button>
+    </div>
+  </header>
+  <main>
+    <!-- cards -->
+    <div class="row row-cols-1 row-cols-md-3 g-4 " id="cards">
+
+    </div>
+    <!-- showAll button -->
+    <div id="showAllBtn" class=" d-none d-flex justify-content-center mt-3 mb-5">
+      <button class="rounded px-3 py-2 border-0 bg-danger bg-gradient fw-semibold text-white">showAll</button>
+    </div>
+    <!-- modal body section -->
+    <section>
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close bg-danger rounded-circle" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+            </div>
+            <!-- have to work here -->
+            <div class="modal-body" id="modal-body">
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align: center; margin: 30px 0px;">
+        <button onclick="pagination()"
+          class="rounded px-3 py-2 border-0 bg-danger bg-gradient fw-semibold text-white">See More</button>
+      </div>
+    </section>
+  </main>
+
+</body>
+
+
+
+
+
+<!-- bootstrap js -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- my js link -->
+<script>
+
+  // js code
+  function allUniverseHub() {
+    const url = `https://openapi.programming-hero.com/api/ai/tools`;
+    fetch(url).then(res => res.json())
+      .then(data => insideCardItems(data.data.tools))
+  }
+
+  // card Holder
+  const cardHolder = document.getElementById('cards');
+
+  let showData = 6
+  function pagination() {
+    showData = showData + 3;
+    cardHolder.innerHTML = ""
+    allUniverseHub();
+  }
+
+  const insideCardItems = (datas) => {
+    datas.slice(0, showData).forEach(data => {
+      const { name, description, image, published_in, features, id } = data;
+      cardHolder.innerHTML += `
+            <div class="col">
+            <div class="card h-100">
+            <img src="${image}" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">Features</h5>
+                <p class="card-text">${features ? features.map((x, i) => `${i + 1}: ${x}`).join("</br>") : "Sorry,But we can't proceed your request at this moment"}</p>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <div>
+                    <h4>${name ? name : "Sorry,But we can't proceed your request at this moment"}</h4>
+                    <p><span class="iconify mb-1 me-2" data-icon="uil:calender"></span>${published_in}</p>
+                </div>
+                <div>
+                    <span onClick='singleData("${id}")' style="color:orange;cursor: pointer;" data-bs-toggle="modal" data-bs-target="#exampleModal" class="iconify" data-icon="lucide:arrow-right" data-width="37"></span>
+                </div>
+            </div>
+            </div> 
+        </div>
+        `;
+    });
+  }
+
+  allUniverseHub();
+
+  //  এখানে সিন্গেল ডাটা কল করা হয়েছে 
+  function singleData(id) {
+    fetch(`https://openapi.programming-hero.com/api/ai/tool/${id}`)
+      .then(res => res.json())
+      .then(data => modalOpen(data.data))
+  }
+
+  // এটা মডাল এখানে সব কিছু বর্ননা করুন 
+
+  function modalOpen(data) {
+    console.log(data);
+    const { id, image_link, tool_name, description, website, logo, pricing, use_cases, accuracy } = data;
+    const modalBody = document.getElementById('modal-body');
+    modalBody.innerHTML = `<div class="row ">
+    <div class="col-md-7">
+      <div style="border: 1px solid red;padding: 20px;margin-left: 20px;border-radius: 10px;background-color: rgba(255, 0, 0, 0.116);" >
+      <p>${description}</p>
+            <div>
+            
+            </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div id="showMoreInfo2" class=" border p-2 rounded p-4">
+
+      <img src=${image_link[0]} width="100%" />
+      <h2>${tool_name}</h2>
+      </div>
+    </div>
+  </div>`
+  }
+
+
+</script>
+<!-- iconify link -->
+<script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+</body>
+
+</html>
